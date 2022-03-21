@@ -1,5 +1,5 @@
 import qrCode from "qrcode-terminal";
-import { Client } from "whatsapp-web.js";
+import { Client, LocalAuth } from "whatsapp-web.js";
 import { getIO } from "./socket";
 import Whatsapp from "../models/Whatsapp";
 import AppError from "../errors/AppError";
@@ -31,29 +31,18 @@ const syncUnreadMessages = async (wbot: Session) => {
     }
   }
 };
-
+const fs = require('fs');
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
   return new Promise((resolve, reject) => {
     try {
-      const io = getIO();
-      const sessionName = whatsapp.name;
-      let sessionCfg;
-
-      if (whatsapp && whatsapp.session) {
-        sessionCfg = JSON.parse(whatsapp.session);
-      }
-
-      const args:String = process.env.CHROME_ARGS || "";
-
-      const wbot: Session = new Client({
-        session: sessionCfg,
-        puppeteer: {
-          executablePath: process.env.CHROME_BIN || undefined,
-          // @ts-ignore
-          browserWSEndpoint: process.env.CHROME_WS || undefined,
-          args: args.split(' ')
-        }
-      });
+const io = getIO();
+const sessionName = whatsapp.name;
+//const SESSION_FILE_PATH = './session.json';
+//let sessionCfg;
+//if (fs.existsSync(SESSION_FILE_PATH)) {
+//  sessionCfg = require(SESSION_FILE_PATH);
+//}
+const wbot: Session = new Client({ puppeteer: { headless: false }, authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id})});
 
       wbot.initialize();
 
