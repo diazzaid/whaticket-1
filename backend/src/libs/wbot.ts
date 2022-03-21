@@ -38,11 +38,19 @@ export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
 const io = getIO();
 const sessionName = whatsapp.name;
 //const SESSION_FILE_PATH = './session.json';
-//let sessionCfg;
+let sessionCfg;
 //if (fs.existsSync(SESSION_FILE_PATH)) {
 //  sessionCfg = require(SESSION_FILE_PATH);
 //}
-const wbot: Session = new Client({ puppeteer: { headless: false }, authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id})});
+const wbot: Session = new Client({
+        session: sessionCfg,
+        authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
+        puppeteer: { 
+		headless: false,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          executablePath: process.env.CHROME_BIN || undefined
+      },
+      });
 
       wbot.initialize();
 
