@@ -31,18 +31,19 @@ const syncUnreadMessages = async (wbot: Session) => {
     }
   }
 };
-const fs = require('fs');
+
 export const initWbot = async (whatsapp: Whatsapp): Promise<Session> => {
   return new Promise((resolve, reject) => {
     try {
-const io = getIO();
-const sessionName = whatsapp.name;
-//const SESSION_FILE_PATH = './session.json';
-let sessionCfg;
-//if (fs.existsSync(SESSION_FILE_PATH)) {
-//  sessionCfg = require(SESSION_FILE_PATH);
-//}
-const wbot: Session = new Client({
+      const io = getIO();
+      const sessionName = whatsapp.name;
+      let sessionCfg;
+
+      if (whatsapp && whatsapp.session) {
+        sessionCfg = JSON.parse(whatsapp.session);
+      }
+	  
+	  const wbot: Session = new Client({
         session: sessionCfg,
         authStrategy: new LocalAuth({clientId: 'bd_'+whatsapp.id}),
         puppeteer: { 
@@ -73,9 +74,9 @@ const wbot: Session = new Client({
 
       wbot.on("authenticated", async session => {
         logger.info(`Session: ${sessionName} AUTHENTICATED`);
-        await whatsapp.update({
-          session: JSON.stringify(session)
-        });
+//        await whatsapp.update({
+//          session: JSON.stringify(session)
+//        });
       });
 
       wbot.on("auth_failure", async msg => {
